@@ -1,0 +1,174 @@
+﻿
+<style>
+div.winner {
+        font-size: 70px;
+        color: white;
+        margin-top: 40px;
+    }
+
+
+
+
+    div.center {
+        text-align: center;
+        margin-top: 100px;
+        background-color: #c01a23;
+        height: 400px;
+    }
+
+    .btn {
+        width: 300px;
+        height: 50px;
+        font-size: 24px;
+        color: blue;
+    }
+    
+
+    .headerluck {
+        color: white;
+        font-size: 30px;
+        background-color: #949598;
+        font-family: sans-serif;
+    }
+</style>
+<script src="/js/jquery-3.1.1.js"></script>
+<!-- Our CSS stylesheet file -->
+
+<div style="height:70px"></div>
+
+<div>
+
+    <div class="center">
+        <div class="headerluck">Lucky Draw Winner</div>
+
+        <div id="display" class="winner">
+        </div>
+
+
+    </div>
+
+    <div style="height:10px"></div>
+
+</div>
+<div id="buttondisplay" align="center" style="margin-bottom:10px;">
+    <input type="button" id="random" class="btn" value="Select Winner !" />
+</div>
+
+<!-- Include Firebase Library -->
+<script src="https://cdn.firebase.com/js/client/2.2.3/firebase.js"></script>
+<script src=" /js/jquery.shuffleLetters.js"></script>
+<script type="text/javascript">
+
+    var masterStudents = [];
+    //create firebase reference
+   // var dbRef = new Firebase("https://ustdb.firebaseio.com/fdRegisteredUsers");
+    //var dbRef= new Firebase("https://ustdb.firebaseio.com/userRegistration");
+   // var dbRef = new Firebase("https://ustdb.firebaseio.com/empVoteCount/");
+    // var dbRef = new Firebase("https://ustdb.firebaseio.com/employeeList");
+    var dbRef = new Firebase("https://ustglobalphl.firebaseio.com/fdRegisteredUsers");
+    //var dbRef = new Firebase(" https://ustglobalphl.firebaseio.com/listUid");
+    var dbRefMaster = new Firebase(" https://ustglobalphl.firebaseio.com/listUid");
+    var studentstemp;
+    var mastertemp;
+    var students = [];
+    /*var students = [
+       { 'userId': "U52044", 'userName': "Pranjal" },
+        { 'userId': "U52885", 'userName': "Tanveer" },
+        { 'userId': "u45376", 'userName': "Amit" },
+        { 'userId': "u46961", 'userName': "Nimesh" }
+
+
+    ];*/
+
+
+    // Attach an asynchronous callback to read the data at our posts reference
+
+    dbRef.on("value", function (snapshot) {
+        studentstemp = JSON.parse(JSON.stringify(snapshot.val()));
+        Object.keys(studentstemp).forEach(function (key) {
+            var value = studentstemp[key];
+            students.push(value);
+
+        });
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+    });
+    dbRefMaster.on("value", function (snapshot) {
+        mastertemp = JSON.parse(JSON.stringify(snapshot.val()));
+        Object.keys(mastertemp).forEach(function (key) {
+            var value = mastertemp[key];
+            masterStudents.push(value);
+
+        });
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+    });
+
+
+    var audio = new Audio('/media/running1.mp3');
+    var audioselected = new Audio('/media/winning1.mp3');
+
+    var $display = $("#display");
+    var letters = $("#tagline").children();
+
+
+    var selectedAns = 0;
+    $('#random').click(function () {
+        console.log(students);
+        var total = students.length;
+        audio.currentTime = 0;
+        audio.play();
+        audioselected.pause();
+        document.clear();
+        var isselected = 0;
+        var total = students.length;
+        console.log('total' + total);
+        console.log(studentstemp);
+        selected = Math.floor(Math.random() * total),
+        i = 0;
+        console.log("selected", selected);
+        console.log(students);
+        // improvement: use a for loop instead of a for..in
+
+        for (i = 0; i < total; i++) {
+            console.log("for", i);
+            setTimeout((function (i) {
+                return function () {
+                    // code here will be delayed
+                    console.log("timeout", i);
+                    var result = $.grep(masterStudents, function (e) { return e.userId.toUpperCase() == students[i].userId.toUpperCase(); });
+                    if (result.length > 0) {
+                        $display.text(result[0].userName.toUpperCase() + ' (' + students[i].userId.toUpperCase() + ')');
+                        if (i === selected) {
+                            $display.text(result[0].userName.toUpperCase() + ' (' + students[i].userId.toUpperCase() + ')');
+                            $display.addClass("winner");
+                            $display.shuffleLetters();
+
+                            isselected = 1;
+                            setTimeout(function () { audio.pause(); audioselected.play(); students.splice(i, 1); }, 7000);
+                        }
+
+
+                        //$display.text(students[i].userName.toUpperCase()+' ('+students[i].userId.toUpperCase()+')');
+                    }
+                };
+            }(i)), i * 100);
+            if (isselected === 1)
+                break;
+            // improvement: triple equal sign, always !
+            if (i === selected) {
+                // code here will execute immediately
+                break;
+            }
+        }
+
+    });
+
+
+
+
+
+
+</script>
+
+
